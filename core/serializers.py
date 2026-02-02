@@ -1,7 +1,10 @@
 from rest_framework import serializers
-from .models import Note
+from .models import Task
 
-class NoteSerializer(serializers.ModelSerializer):
+class TaskSerializer(serializers.ModelSerializer):
+  assigned_to = serializers.IntegerField(required=False, allow_null=True)
+  reviewer = serializers.IntegerField(required=False, allow_null=True)
+
   class Meta:
-    model = Note
-    fields = ["id", "title", "content", "created_at"]
+    model = Task
+    fields = "__all__"

@@ -1,5 +1,6 @@
 from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
+
 from .views import health, notes_list, note_detail
 
 urlpatterns = [
@@ -8,4 +9,5 @@ urlpatterns = [
   path("notes/<int:pk>/", note_detail),
 
   path("login/", obtain_auth_token),
+
 ]
