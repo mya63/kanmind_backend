@@ -14,89 +14,55 @@ def health(request):
 
 
 @api_view(["GET", "POST"])
-def notes_list(request):
-
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def tasks_list(request):
   if request.method == "GET":
-    notes = Task.objects.all().order_by("-created_at")
-    serializer = TaskSerializer(notes, many=True)
-    return Response(serializer.data)
+    tasks = Task.objects.all().order_by("-updated_at")
+    return Response(TaskSerializer(tasks, many=True).data)
 
-  elif request.method =="POST":
-    serializer = TaskSerializer(data=request.data)
-    if serializer.is_valid():
+  serializer = TaskSerializer(data=request.data)
+  if serializer.is_valid():
       serializer.save()
       return Response(serializer.data, status=status.HTTP_201_CREATED)
-
   return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(["GET", "PUT", "DELETE"])
-def note_detail(request, pk):
+
+@api_view(["GET", "PATCH", "DELETE"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def tasks_detail(request, pk):
   try:
-      note = Task.objects.get(pk=pk)
+      tasks = Task.objects.get(pk=pk)
   except Task.DoesNotExist:
       return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
   
   if request.method =="GET":
-     serializer = TaskSerializer(note)
-     return Response(serializer.data)
+     return Response(TaskSerializer(tasks).data)
   
-  if request.method =="PUT":
-     serializer = TaskSerializer(note, data=request.data)
+  if request.method =="PATCH":
+     serializer = TaskSerializer(tasks, data=request.data)
      if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
   
-  elif request.method =="DELETE":
-    note.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
+  tasks.delete()
+  return Response(status=status.HTTP_204_NO_CONTENT)
+
   
-  @api_view(["GET", "POST"])
-  @authentication_classes([TokenAuthentication])
-  @permisson_classes([IsAuthenticated])
-  def tasks_list(request):
-     if request.method == "GET":
-        tasks = Task.objects.all().order_by("_updated_at")
-        return Response(TaskSerializer(tasks, many=True).data)
-     
-     serializer = TaskSerializer(data=request.data)
-     if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
   
-  @api_view(["GET"])
-  @authentication_classes([TokenAuthentication])
-  @permission_classes([IsAuthenticated])
-  def tasks_assigned_to_me(request):
-     tasks = Task.objects.filter(assigned_to=request.user).order_by("-updated_at")
-     return Response(TaskSerializer(tasks, many=True).data)
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def tasks_assigned_to_me(request):
+   tasks = Task.objects.filter(assigned_to=request.user).order_by("-updated_at")
+   return Response(TaskSerializer(tasks, many=True).data)
   
-  @api_view(["GET"])
-  @authentication_classes([TokenAuthentication])
-  @permission_classes([IsAuthenticated])
-  def tasks_reviewing(request):
-     tasks = Task.objects.filter(reviewer=request.user).order_by("-updated_at")
-     return Response(TaskSerializer(tasks, many=True).data)
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def tasks_reviewing(request):
+   tasks = Task.objects.filter(reviewer=request.user).order_by("-updated_at")
+   return Response(TaskSerializer(tasks, many=True).data)
   
-  @api_view(["GET", "PATCH", "DELETE"])
-  @authentication_classes([TokenAuthentication])
-  @permission_classes([IsAuthenticated])
-  def task_detail(request, pk):
-     try:
-        task = Task.objects.get(pk=pk)
-     except Task.DoesNotExist:
-        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-     
-     if request.method == "GET":
-        return Response(TaskSerializer(task).data)
-     
-     if request.method == "PATCH":
-        serializer = TaskSerializer(task, data=request.data, partial=True)
-        if serializer.is_valid():
-           serializer.save()
-           return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-     
-     task.delete()
-     return Response(status=status.HTTP_204_NO_CONTENT)

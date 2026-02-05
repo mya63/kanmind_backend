@@ -1,13 +1,13 @@
 from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
-
-from .views import health, notes_list, note_detail
+from .views import (health, tasks_list, tasks_detail, tasks_assigned_to_me, tasks_reviewing,)
 
 urlpatterns = [
   path("health/", health),
-  path("notes/", notes_list),
-  path("notes/<int:pk>/", note_detail),
-
   path("login/", obtain_auth_token),
 
+  path("tasks/", tasks_list),
+  path("tasks/<int:pk>/", tasks_detail),
+  path("tasks/assigned/", tasks_assigned_to_me),
+  path("tasks/reviewing/", tasks_reviewing),
 ]
