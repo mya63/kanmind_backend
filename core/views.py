@@ -41,7 +41,7 @@ def tasks_detail(request, pk):
      return Response(TaskSerializer(tasks).data)
   
   if request.method =="PATCH":
-     serializer = TaskSerializer(tasks, data=request.data)
+     serializer = TaskSerializer(tasks, data=request.data, partial=True)
      if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
