@@ -14,6 +14,8 @@ urlpatterns = [
   path("tasks/", tasks_list),
   path("tasks/<int:pk>/", tasks_detail),
   
+  path("tasks/assigned/", tasks_assigned_to_me),
   path("tasks/assigned-to-me/", tasks_assigned_to_me),
+
   path("tasks/reviewing/", tasks_reviewing),
 ]
