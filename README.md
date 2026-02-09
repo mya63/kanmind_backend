@@ -1,7 +1,10 @@
 # KanMind Backend API
 
-Dieses Projekt ist ein **Django REST Framework Backend** für eine einfache Notiz-Anwendung.
-Es stellt eine **REST API mit Token-basierter Authentifizierung** bereit.
+Dieses Projekt ist ein **Django REST Framework Backend** für eine einfache
+**Task- und Kanban-Anwendung (KanMind)**.
+
+Es stellt eine **REST API mit token-basierter Authentifizierung** bereit
+und dient als Backend für ein externes Frontend.
 
 Das Projekt wurde im Rahmen der **Developer Akademie** umgesetzt.
 
@@ -10,9 +13,47 @@ Das Projekt wurde im Rahmen der **Developer Akademie** umgesetzt.
 ## 🚀 Features
 
 - Django REST Framework
-- Token Authentication (Login per API)
-- Geschützte Endpunkte
-- CRUD-API für Notizen
+- Token-basierte Authentifizierung
+- Geschützte API-Endpunkte
+- CRUD-API für Tasks
+- Benutzerzuweisung (Assigned / Reviewer)
+- SQLite Datenbank
+- CORS-Unterstützung
+- API-Tests mit Postman
+
+---
+
+## 🧱 Tech Stack
+
+- Python 3
+- Django 6.0.1
+- Django REST Framework
+- SQLite
+- Postman
+
+---
+
+## 📁 Projektstruktur
+
+# KanMind Backend API
+
+Dieses Projekt ist ein **Django REST Framework Backend** für eine einfache
+**Task- und Kanban-Anwendung (KanMind)**.
+
+Es stellt eine **REST API mit token-basierter Authentifizierung** bereit
+und dient als Backend für ein externes Frontend.
+
+Das Projekt wurde im Rahmen der **Developer Akademie** umgesetzt.
+
+---
+
+## 🚀 Features
+
+- Django REST Framework
+- Token-basierte Authentifizierung
+- Geschützte API-Endpunkte
+- CRUD-API für Tasks
+- Benutzerzuweisung (Assigned / Reviewer)
 - SQLite Datenbank
 - CORS-Unterstützung
 - API-Tests mit Postman
@@ -33,9 +74,9 @@ Das Projekt wurde im Rahmen der **Developer Akademie** umgesetzt.
 
 kanmind_backend/
 ├── kanmind/ # Projekt-Settings & Root-URLs
-├── core/ # API App (Views, URLs)
-├── db.sqlite3 # Datenbank
-├── .env # Environment Variablen (nicht im Repo)
+├── core/ # API App (Models, Views, Serializer, URLs)
+├── db.sqlite3 # SQLite Datenbank
+├── .env # Environment Variablen (nicht im Repository)
 ├── .gitignore
 └── README.md
 
@@ -50,14 +91,21 @@ Der Django `SECRET_KEY` wird über eine `.env` Datei geladen.
 ```env
 DJANGO_SECRET_KEY=django-insecure-xxxxxxxxxxxxxxxx
 
-▶️ Projekt starten
 
+▶️ Projekt starten
 python manage.py runserver
+
+Backend läuft anschließend unter:
+http://127.0.0.1:8000/
 
 
 🔑 Authentifizierung (Token Login)
 
-/api/login/
+Login Endpoint:
+
+POST /api/login/
+
+
 
 Request Body (JSON):
 
@@ -66,33 +114,55 @@ Request Body (JSON):
   "password": "dein_passwort"
 }
 
+
+
 Response:
 
 {
   "token": "abc123..."
 }
 
-📝 Notes API
-
-GET /api/notes/
-
-Header Authorization: Token <DEIN_TOKEN>
 
 
-Neue Notiz erstellen
+Der Token muss bei allen geschützten Requests
+im Header mitgesendet werden:
 
-POST /api/notes/
+Authorization: Token <DEIN_TOKEN>
 
-Body (JSON): 
 
+
+📋 Tasks API
+Alle Tasks abrufen:
+
+GET /api/tasks/
+
+Task erstellen:
+
+POST /api/tasks/
+
+json:
 {
-  "title": "Neue Notiz",
-  "content": "Inhalt aus Postman"
+  "title": "Neue Aufgabe",
+  "description": "Beschreibung",
+  "status": "todo"
 }
 
-Einzelne Notiz abrufen
 
-GET /api/notes/<id>/
+Einzelnen Task abrufen / ändern / löschen:
+
+GET    /api/tasks/<id>/
+PATCH  /api/tasks/<id>/
+DELETE /api/tasks/<id>/
+
+Aufgaben des eingeloggten Users:
+
+GET /api/tasks/assigned-to-me/
+
+
+Aufgaben zur Überprüfung:
+
+GET /api/tasks/reviewing/
+
 
 🧪 API Tests
 
@@ -102,12 +172,16 @@ Login (Token erhalten)
 
 Authentifizierte Requests
 
-GET / POST Notizen
+CRUD-Operationen für Tasks
+
+Benutzerbezogene Filter (assigned / reviewing)
+
 
 📌 Hinweis
 
 Dieses Projekt ist ein reines Backend (API-only).
-Ein Frontend ist nicht Teil dieser Abgabe, kann aber problemlos angebunden werden.
+Ein Frontend kann über HTTP/Fetch problemlos angebunden werden.
+
 
 👤 Autor
 
