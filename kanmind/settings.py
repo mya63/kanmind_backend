@@ -10,30 +10,53 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+
+"""
+Zentrale Django-Konfigurationsdatei für das KanMind-Backend.
+
+Hier werden globale Einstellungen wie:
+- installierte Apps
+- Middleware
+- Datenbank
+- Authentifizierung
+- CORS
+definiert.
+"""
+
 from pathlib import Path
 from dotenv import load_dotenv
 import os
 
+# Lädt Umgebungsvariablen aus der .env Datei
 load_dotenv()
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Lädt Umgebungsvariablen aus der .env Datei
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+
+# ---------------------------
+# Sicherheit & Debug
+# ---------------------------
+
+# Geheimschlüssel (aus .env, nicht im Code hardcodiert)
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-# SECURITY WARNING: don't run with debug turned on in production!
+
+# Debug ist nur für Entwicklung aktiviert
 DEBUG = True
 
+# Erlaubte Hosts (lokale Entwicklung)
 ALLOWED_HOSTS = []
 
 
-# Application definition
+# ---------------------------
+# Installierte Apps
+# ---------------------------
 
 INSTALLED_APPS = [
-    'corsheaders',
+    'corsheaders',  # Ermöglicht CORS für externes Frontend
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,13 +64,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework',
-    'rest_framework.authtoken',
-    'core',
+    'rest_framework', # Django REST Framework
+    'rest_framework.authtoken', # Django REST Framework
+    'core', # Eigene App (Tasks, API)
 ]
 
+# ---------------------------
+# Middleware
+# ---------------------------
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # CORS Support
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -57,6 +83,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Root-URL-Konfiguration
 ROOT_URLCONF = 'kanmind.urls'
 
 TEMPLATES = [
@@ -80,6 +107,7 @@ WSGI_APPLICATION = 'kanmind.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# SQLite wird für die Entwicklungsphase genutzt
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -124,6 +152,12 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# ---------------------------
+# CORS Konfiguration
+# ---------------------------
+
+# Erlaubt Zugriff vom externen Frontend (Live Server)
+
 CORS_ALLOWED_ORIGINS = [
   "http://127.0.0.1:5500",
   "http://localhost:5500",
@@ -131,6 +165,12 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
+
+# ---------------------------
+# Django REST Framework
+# ---------------------------
+
+# Standardmäßig Token-Authentifizierung & Login-Pflicht
 REST_FRAMEWORK = {
   'DEFAULT_AUTHENTICATION_CLASSES': [
     'rest_framework.authentication.TokenAuthentication',

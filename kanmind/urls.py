@@ -14,10 +14,21 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
+"""
+Zentrale URL-Konfiguration des Django-Projekts KanMind.
+
+Hier werden die globalen Routen definiert und
+an die jeweiligen Apps weitergeleitet.
+"""
+
 from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+  # Django Admin-Oberfläche
     path('admin/', admin.site.urls),
+    # Alle API-Endpunkte werden an die core-App delegiert
+    # z.B. /api/login/, /api/tasks/, /api/tasks/assigned-to-me/
     path('api/', include('core.urls')),
 ]
