@@ -5,7 +5,10 @@ from .views import (
   tasks_list, 
   tasks_detail, 
   tasks_assigned_to_me, 
-  tasks_reviewing,)
+  tasks_reviewing,
+  registration,
+  BoardListCreateView,
+  )
 
 urlpatterns = [
   # Health-Check, um zu prüfen ob API läuft
@@ -29,4 +32,8 @@ urlpatterns = [
 
 # Tasks, bei denen der User Reviewer ist
   path("tasks/reviewing/", tasks_reviewing),
+
+  path("registration/", registration),
+
+  path('boards/', BoardListCreateView.as_view()),
 ]
