@@ -8,6 +8,7 @@ from .views import (
   tasks_reviewing,
   registration,
   BoardListCreateView,
+  BoardDetailView
   )
 
 urlpatterns = [
@@ -36,4 +37,5 @@ urlpatterns = [
   path("registration/", registration),
 
   path('boards/', BoardListCreateView.as_view()),
+  path("boards/<int:pk>/", BoardDetailView.as_view())
 ]

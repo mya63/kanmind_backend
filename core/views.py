@@ -132,3 +132,13 @@ class BoardListCreateView(generics.ListCreateAPIView):
       member_ids = self.request.data.get("members", [])
       if isinstance(member_ids, list) and member_ids:
          board.members.add(*User.objects.filter(id__in=member_ids))
+
+class BoardDetailView(generics.RetrieveUpdateDestroyAPIView):
+   authentication_classes = [TokenAuthentication]
+   permission_classes = [permissions.IsAuthenticated]
+   serializer_class = BoardSerializer
+
+   def get_queryset(self):
+       user = self.request.user
+       return Board.objects.filter(Q(owner=user) 
+       (members=user)).distinct()

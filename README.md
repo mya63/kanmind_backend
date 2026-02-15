@@ -1,46 +1,9 @@
 # KanMind Backend API
 
-Dieses Projekt ist ein **Django REST Framework Backend** für eine einfache
+Dieses Projekt ist ein **Django REST Framework Backend** für eine einfache  
 **Task- und Kanban-Anwendung (KanMind)**.
 
-Es stellt eine **REST API mit token-basierter Authentifizierung** bereit
-und dient als Backend für ein externes Frontend.
-
-Das Projekt wurde im Rahmen der **Developer Akademie** umgesetzt.
-
----
-
-## 🚀 Features
-
-- Django REST Framework
-- Token-basierte Authentifizierung
-- Geschützte API-Endpunkte
-- CRUD-API für Tasks
-- Benutzerzuweisung (Assigned / Reviewer)
-- SQLite Datenbank
-- CORS-Unterstützung
-- API-Tests mit Postman
-
----
-
-## 🧱 Tech Stack
-
-- Python 3
-- Django 6.0.1
-- Django REST Framework
-- SQLite
-- Postman
-
----
-
-## 📁 Projektstruktur
-
-# KanMind Backend API
-
-Dieses Projekt ist ein **Django REST Framework Backend** für eine einfache
-**Task- und Kanban-Anwendung (KanMind)**.
-
-Es stellt eine **REST API mit token-basierter Authentifizierung** bereit
+Es stellt eine **REST API mit token-basierter Authentifizierung** bereit  
 und dient als Backend für ein externes Frontend.
 
 Das Projekt wurde im Rahmen der **Developer Akademie** umgesetzt.
@@ -75,10 +38,11 @@ Das Projekt wurde im Rahmen der **Developer Akademie** umgesetzt.
 kanmind_backend/
 ├── kanmind/ # Projekt-Settings & Root-URLs
 ├── core/ # API App (Models, Views, Serializer, URLs)
-├── db.sqlite3 # SQLite Datenbank
+├── db.sqlite3 # SQLite Datenbank (nicht im Repository)
 ├── .env # Environment Variablen (nicht im Repository)
 ├── .gitignore
 └── README.md
+
 
 
 ---
@@ -88,59 +52,99 @@ kanmind_backend/
 Der Django `SECRET_KEY` wird über eine `.env` Datei geladen.
 
 ### `.env`
+
 ```env
 DJANGO_SECRET_KEY=django-insecure-xxxxxxxxxxxxxxxx
 
 
-▶️ Projekt starten
+⚙️ Installation & Setup
+
+Repository klonen:
+
+git clone <REPOSITORY_URL>
+cd kanmind_backend
+
+
+
+
+Virtuelle Umgebung erstellen:
+
+python -m venv venv
+
+
+
+
+Aktivieren (Windows):
+
+venv\Scripts\activate
+
+
+
+
+Dependencies installieren:
+
+pip install -r requirements.txt
+
+
+
+
+Migrationen ausführen:
+
+python manage.py migrate
+
+
+
+
+Server starten:
+
 python manage.py runserver
 
+
+
+
 Backend läuft anschließend unter:
+
 http://127.0.0.1:8000/
 
-
 🔑 Authentifizierung (Token Login)
+
+
 
 Login Endpoint:
 
 POST /api/login/
 
-
-
-Request Body (JSON):
-
+Request Body (JSON)
 {
   "username": "dein_username",
   "password": "dein_passwort"
 }
 
-
-
-Response:
-
+Response
 {
   "token": "abc123..."
 }
 
 
 
-Der Token muss bei allen geschützten Requests
-im Header mitgesendet werden:
+
+Der Token muss bei allen geschützten Requests im Header mitgesendet werden:
 
 Authorization: Token <DEIN_TOKEN>
 
-
-
 📋 Tasks API
+
 Alle Tasks abrufen:
 
 GET /api/tasks/
+
+
+
 
 Task erstellen:
 
 POST /api/tasks/
 
-json:
 {
   "title": "Neue Aufgabe",
   "description": "Beschreibung",
@@ -148,20 +152,43 @@ json:
 }
 
 
+
+
 Einzelnen Task abrufen / ändern / löschen:
 
-GET    /api/tasks/<id>/
-PATCH  /api/tasks/<id>/
-DELETE /api/tasks/<id>/
+GET     /api/tasks/<id>/
+PATCH   /api/tasks/<id>/
+DELETE  /api/tasks/<id>/
+
+
+
 
 Aufgaben des eingeloggten Users:
 
 GET /api/tasks/assigned-to-me/
 
 
+
+
 Aufgaben zur Überprüfung:
 
 GET /api/tasks/reviewing/
+
+
+
+📌 Boards API
+
+Alle Boards abrufen:
+
+GET /api/boards/
+
+
+
+
+Board erstellen:
+
+POST /api/boards/
+
 
 
 🧪 API Tests
@@ -177,10 +204,12 @@ CRUD-Operationen für Tasks
 Benutzerbezogene Filter (assigned / reviewing)
 
 
+
 📌 Hinweis
 
 Dieses Projekt ist ein reines Backend (API-only).
 Ein Frontend kann über HTTP/Fetch problemlos angebunden werden.
+
 
 
 👤 Autor
