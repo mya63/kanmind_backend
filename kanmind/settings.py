@@ -48,7 +48,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 DEBUG = True
 
 # Erlaubte Hosts (lokale Entwicklung)
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 
 # ---------------------------
@@ -64,9 +64,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    "authentication",
+    "tasks",
+    "boards",
+
     'rest_framework', # Django REST Framework
     'rest_framework.authtoken', # Django REST Framework
-    'core', # Eigene App (Tasks, API)
 ]
 
 # ---------------------------
