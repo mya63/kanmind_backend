@@ -9,7 +9,8 @@ from boards.models import Board  # MYA
 from boards.serializers import (
     BoardSerializer,         # MYA
     BoardListSerializer,     # MYA
-    BoardDetailSerializer,   # MYA
+    BoardDetailSerializer,
+    BoardPatchSerializer   # MYA
 )
 
 
@@ -55,8 +56,12 @@ class BoardDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_class(self):  # MYA
-        return BoardDetailSerializer if self.request.method == "GET" else BoardSerializer  # MYA
-
+        if self.request.method == "GET":
+            return BoardDetailSerializer  # MYA
+        if self.request.method == "PATCH":
+            return BoardPatchSerializer  # MYA: Doku PATCH Response
+        return BoardSerializer  # MYA (z.B. DELETE egal)
+    
     def get_queryset(self):  # MYA: nicht filtern -> 403 möglich
         return Board.objects.all().prefetch_related("members", "tasks")  # MYA
 
@@ -66,3 +71,12 @@ class BoardDetailView(generics.RetrieveUpdateDestroyAPIView):
         if obj.owner_id != u.id and not obj.members.filter(id=u.id).exists():
             raise PermissionDenied("Forbidden")  # MYA
         return obj
+    def destroy(self, request, *args, **kwargs):
+        board = self.get_object()
+
+    # Only owner is allowed to delete the board
+        if board.owner_id != request.user.id:
+            raise PermissionDenied("Only the board owner can delete this board.")
+
+        board.delete()
+        return Response(status=204)

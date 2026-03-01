@@ -12,6 +12,10 @@ from rest_framework import status
 
 from .serializers import RegistrationSerializer
 
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -64,3 +68,44 @@ def login(request):
         },
         status=status.HTTP_200_OK
     )
+
+class EmailCheckView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        email = request.query_params.get("email", "").strip()
+
+        # Email fehlt
+        if not email:
+            return Response(
+                {"detail": "Email is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Email Format prüfen
+        try:
+            validate_email(email)
+        except ValidationError:
+            return Response(
+                {"detail": "Invalid email format."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # User suchen
+        user = User.objects.filter(email__iexact=email).first()
+        if not user:
+            return Response(
+                {"detail": "Email not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        fullname = f"{user.first_name} {user.last_name}".strip() or user.username
+
+        return Response(
+            {
+                "id": user.id,
+                "email": user.email,
+                "fullname": fullname
+            },
+            status=status.HTTP_200_OK
+        )

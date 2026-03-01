@@ -3,6 +3,7 @@ from rest_framework import serializers
 from boards.models import Board  # MYA
 
 
+
 class BoardListSerializer(serializers.ModelSerializer):  # MYA
     member_count = serializers.IntegerField(read_only=True)  # MYA
     ticket_count = serializers.IntegerField(read_only=True)  # MYA
@@ -81,3 +82,31 @@ class BoardDetailSerializer(serializers.ModelSerializer):  # MYA
     def _comments_count(self, t):  # MYA
         rel = getattr(t, "comments", None) or getattr(t, "comment_set", None)
         return rel.count() if rel else 0  # MYA
+    
+class BoardPatchSerializer(serializers.ModelSerializer):  # MYA
+    owner_data = BoardMemberSerializer(source="owner", read_only=True)  # MYA
+    members_data = BoardMemberSerializer(source="members", many=True, read_only=True)  # MYA
+    members = serializers.ListField(  # MYA
+        child=serializers.IntegerField(),
+        required=False
+    )
+
+    class Meta:
+        model = Board
+        fields = ["id", "title", "members", "owner_data", "members_data"]  # MYA
+
+    def update(self, instance, validated_data):  # MYA
+        # MYA: title updaten
+        if "title" in validated_data:
+            instance.title = validated_data["title"]
+            instance.save()
+
+        # MYA: members LISTE SETZEN (ersetzen!)
+        if "members" in validated_data:
+            ids = validated_data["members"]
+            users = User.objects.filter(id__in=ids)
+            instance.members.set(users)  # MYA: ersetzt komplett
+            # MYA: Owner immer drin lassen (optional, aber sinnvoll)
+            instance.members.add(instance.owner)
+
+        return instance
