@@ -81,20 +81,28 @@ class TaskSerializer(serializers.ModelSerializer):
         return board.members.filter(id=user.id).exists()
 
     def validate(self, attrs):
-        # Board kommt bei Create aus attrs, bei Update aus instance
         board = attrs.get("board", getattr(self.instance, "board", None))
-
         assignee = attrs.get("assignee", getattr(self.instance, "assignee", None))
         reviewer = attrs.get("reviewer", getattr(self.instance, "reviewer", None))
 
-        if board and assignee and not self._is_board_member(board, assignee):
-            raise serializers.ValidationError({"assignee_id": "Assignee muss Mitglied des Boards sein."})
+        # ❗ Board darf bei Update nicht geändert werden
+        if self.instance and "board" in attrs:
+            raise serializers.ValidationError({"board": "Board cannot be changed."})
 
+        # Assignee muss Board-Member sein
+        if board and assignee and not self._is_board_member(board, assignee):
+            raise serializers.ValidationError(
+                {"assignee_id": "Assignee must be a board member."}
+        )
+
+    # Reviewer muss Board-Member sein
         if board and reviewer and not self._is_board_member(board, reviewer):
-            raise serializers.ValidationError({"reviewer_id": "Reviewer muss Mitglied des Boards sein."})
+            raise serializers.ValidationError(
+            {"reviewer_id": "Reviewer must be a board member."}
+        )
 
         return attrs
-
+    
     def create(self, validated_data):
         request = self.context.get("request")
         validated_data["created_by"] = request.user  # MYA: serverseitig setzen
@@ -114,8 +122,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "in_progress": "in-progress",
         }
         return mapping.get(value, value)
-
-
+    
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SerializerMethodField()
 
