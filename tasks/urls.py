@@ -1,9 +1,12 @@
 from django.urls import path
-from tasks.views import tasks_list, tasks_detail, tasks_assigned_to_me, tasks_reviewing  # MYA
+from tasks import views
 
 urlpatterns = [
-    path("tasks/", tasks_list),
-    path("tasks/<int:pk>/", tasks_detail),
-    path("tasks/assigned-to-me/", tasks_assigned_to_me),
-    path("tasks/reviewing/", tasks_reviewing),
-]
+    path("tasks/", views.tasks_list),
+    path("tasks/<int:task_id>/", views.tasks_detail),
+
+    path("tasks/assigned-to-me/", views.tasks_assigned_to_me),
+    path("tasks/reviewing/", views.tasks_reviewing),
+
+    path("tasks/<int:task_id>/comments/", views.task_comments),
+    path("tasks/<int:task_id>/comments/<int:comment_id>/", views.delete_comment),]
