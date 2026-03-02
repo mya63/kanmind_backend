@@ -1,25 +1,26 @@
 # KanMind Backend API
 
-Dieses Projekt ist ein **Django REST Framework Backend** für eine einfache  
-**Task- und Kanban-Anwendung (KanMind)**.
+KanMind ist ein Django REST Framework Backend für eine Task- und Kanban-Anwendung.
 
-Es stellt eine **REST API mit token-basierter Authentifizierung** bereit  
+Das Projekt stellt eine REST API mit Token-basierter Authentifizierung bereit
 und dient als Backend für ein externes Frontend.
 
-Das Projekt wurde im Rahmen der **Developer Akademie** umgesetzt.
+Dieses Projekt wurde im Rahmen der Developer Akademie umgesetzt.
 
 ---
 
 ## 🚀 Features
 
-- Django REST Framework
-- Token-basierte Authentifizierung
-- Geschützte API-Endpunkte
-- CRUD-API für Tasks
-- Benutzerzuweisung (Assigned / Reviewer)
+- Token Authentication (DRF)
+- Board-System mit Owner + Members
+- Task CRUD API
+- Comment-System
+- Benutzer-Zuweisung (Assignee / Reviewer)
+- Board-basierte Zugriffskontrolle
+- Filter: assigned-to-me / reviewing
 - SQLite Datenbank
 - CORS-Unterstützung
-- API-Tests mit Postman
+- Automatisierte Tests mit pytest
 
 ---
 
@@ -27,191 +28,112 @@ Das Projekt wurde im Rahmen der **Developer Akademie** umgesetzt.
 
 - Python 3
 - Django 6.0.1
-- Django REST Framework
+- Django REST Framework 3.16.1
 - SQLite
-- Postman
+- pytest
 
 ---
 
-## 📁 Projektstruktur
+## ⚙️ Installation & Setup
 
-kanmind_backend/
-├── kanmind/ # Projekt-Settings & Root-URLs
-├── core/ # API App (Models, Views, Serializer, URLs)
-├── db.sqlite3 # SQLite Datenbank (nicht im Repository)
-├── .env # Environment Variablen (nicht im Repository)
-├── .gitignore
-└── README.md
+### 1. Repository klonen
 
-
-
----
-
-## 🔐 Environment Variablen
-
-Der Django `SECRET_KEY` wird über eine `.env` Datei geladen.
-
-### `.env`
-
-```env
-DJANGO_SECRET_KEY=django-insecure-xxxxxxxxxxxxxxxx
-
-
-⚙️ Installation & Setup
-
-Repository klonen:
-
+```bash
 git clone <REPOSITORY_URL>
 cd kanmind_backend
 
 
-
-
-Virtuelle Umgebung erstellen:
-
+2. Virtuelle Umgebung erstellen
 python -m venv venv
+3. Aktivieren
 
-
-
-
-Aktivieren (Windows):
+Windows:
 
 venv\Scripts\activate
 
+Mac/Linux:
 
-
-
-Dependencies installieren:
-
+source venv/bin/activate
+4. Dependencies installieren
 pip install -r requirements.txt
-
-
-
-
-Migrationen ausführen:
-
+5. Migrationen ausführen
 python manage.py migrate
-
-
-
-
-Server starten:
-
+6. Server starten
 python manage.py runserver
 
-
-
-
-Backend läuft anschließend unter:
+Backend läuft unter:
 
 http://127.0.0.1:8000/
-
-🔑 Authentifizierung (Token Login)
-
-
-
-Login Endpoint:
-
+🔐 Authentifizierung
+Login
 POST /api/login/
 
-Request Body (JSON)
+Request Body:
+
 {
-  "username": "dein_username",
-  "password": "dein_passwort"
+  "username": "username",
+  "password": "password"
 }
 
-Response
+Response:
+
 {
   "token": "abc123..."
 }
 
-
-
-
-Der Token muss bei allen geschützten Requests im Header mitgesendet werden:
+Token im Header mitsenden:
 
 Authorization: Token <DEIN_TOKEN>
+📌 Boards API
+Methode	Endpoint	Beschreibung
+GET	/api/boards/	Eigene Boards
+POST	/api/boards/	Neues Board erstellen
+GET	/api/boards/<id>/	Board Details
+PATCH	/api/boards/<id>/	Board bearbeiten
+DELETE	/api/boards/<id>/	Board löschen
+
+Board Owner gilt automatisch als Member.
 
 📋 Tasks API
+Methode	Endpoint	Beschreibung
+GET	/api/tasks/	Tasks aus eigenen Boards
+POST	/api/tasks/	Task erstellen
+GET	/api/tasks/<id>/	Task Details
+PATCH	/api/tasks/<id>/	Task bearbeiten
+DELETE	/api/tasks/<id>/	Nur Creator oder Board Owner
+GET	/api/tasks/assigned-to-me/	Mir zugewiesene Tasks
+GET	/api/tasks/reviewing/	Tasks zur Überprüfung
+Permissions
 
-Alle Tasks abrufen:
+Nur Board Members sehen Tasks
 
-GET /api/tasks/
+Nur Creator oder Board Owner dürfen löschen
 
+Board kann nach Erstellung nicht geändert werden
 
+💬 Comments API
+Methode	Endpoint	Beschreibung
+GET	/api/tasks/<id>/comments/	Kommentare anzeigen
+POST	/api/tasks/<id>/comments/	Kommentar erstellen
+DELETE	/api/tasks/<task_id>/comments/<comment_id>/	Nur Author
+🧪 Tests
 
+Alle Tests werden mit pytest ausgeführt.
 
-Task erstellen:
+pytest -q
 
-POST /api/tasks/
+Aktueller Status:
 
-{
-  "title": "Neue Aufgabe",
-  "description": "Beschreibung",
-  "status": "todo"
-}
-
-
-
-
-Einzelnen Task abrufen / ändern / löschen:
-
-GET     /api/tasks/<id>/
-PATCH   /api/tasks/<id>/
-DELETE  /api/tasks/<id>/
-
-
-
-
-Aufgaben des eingeloggten Users:
-
-GET /api/tasks/assigned-to-me/
-
-
-
-
-Aufgaben zur Überprüfung:
-
-GET /api/tasks/reviewing/
-
-
-
-📌 Boards API
-
-Alle Boards abrufen:
-
-GET /api/boards/
-
-
-
-
-Board erstellen:
-
-POST /api/boards/
-
-
-
-🧪 API Tests
-
-Alle Endpunkte wurden erfolgreich mit Postman getestet:
-
-Login (Token erhalten)
-
-Authentifizierte Requests
-
-CRUD-Operationen für Tasks
-
-Benutzerbezogene Filter (assigned / reviewing)
-
-
-
-📌 Hinweis
-
-Dieses Projekt ist ein reines Backend (API-only).
-Ein Frontend kann über HTTP/Fetch problemlos angebunden werden.
-
-
-
+6 passed
+📌 Projektstruktur
+kanmind_backend/
+├── authentication/
+├── boards/
+├── tasks/
+├── core/
+├── manage.py
+├── requirements.txt
+└── README.md
 👤 Autor
 
 Muhammed Yunus Amini
