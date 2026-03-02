@@ -1,26 +1,25 @@
 # KanMind Backend API
 
-KanMind ist ein Django REST Framework Backend für eine Task- und Kanban-Anwendung.
+KanMind is a Django REST Framework backend for a task and kanban application.
 
-Das Projekt stellt eine REST API mit Token-basierter Authentifizierung bereit
-und dient als Backend für ein externes Frontend.
+It provides a REST API with token-based authentication and is intended to be used by an external frontend.
 
-Dieses Projekt wurde im Rahmen der Developer Akademie umgesetzt.
+This project was built as part of the Developer Akademie.
 
 ---
 
 ## 🚀 Features
 
 - Token Authentication (DRF)
-- Board-System mit Owner + Members
+- Board system with Owner + Members
 - Task CRUD API
-- Comment-System
-- Benutzer-Zuweisung (Assignee / Reviewer)
-- Board-basierte Zugriffskontrolle
-- Filter: assigned-to-me / reviewing
-- SQLite Datenbank
-- CORS-Unterstützung
-- Automatisierte Tests mit pytest
+- Comment system
+- User assignment (Assignee / Reviewer)
+- Board-based access control (permissions)
+- Filters: assigned-to-me / reviewing
+- SQLite database
+- CORS support
+- Automated tests with pytest
 
 ---
 
@@ -36,16 +35,15 @@ Dieses Projekt wurde im Rahmen der Developer Akademie umgesetzt.
 
 ## ⚙️ Installation & Setup
 
-### 1. Repository klonen
+### 1) Clone repository
 
 ```bash
 git clone <REPOSITORY_URL>
 cd kanmind_backend
 
-
-2. Virtuelle Umgebung erstellen
+2) Create virtual environment
 python -m venv venv
-3. Aktivieren
+3) Activate
 
 Windows:
 
@@ -54,21 +52,21 @@ venv\Scripts\activate
 Mac/Linux:
 
 source venv/bin/activate
-4. Dependencies installieren
+4) Install dependencies
 pip install -r requirements.txt
-5. Migrationen ausführen
+5) Run migrations
 python manage.py migrate
-6. Server starten
+6) Start server
 python manage.py runserver
 
-Backend läuft unter:
+Backend runs on:
 
 http://127.0.0.1:8000/
-🔐 Authentifizierung
+🔐 Authentication
 Login
 POST /api/login/
 
-Request Body:
+Request body:
 
 {
   "username": "username",
@@ -81,51 +79,48 @@ Response:
   "token": "abc123..."
 }
 
-Token im Header mitsenden:
+Send the token in the header for protected requests:
 
-Authorization: Token <DEIN_TOKEN>
+Authorization: Token <YOUR_TOKEN>
 📌 Boards API
-Methode	Endpoint	Beschreibung
-GET	/api/boards/	Eigene Boards
-POST	/api/boards/	Neues Board erstellen
-GET	/api/boards/<id>/	Board Details
-PATCH	/api/boards/<id>/	Board bearbeiten
-DELETE	/api/boards/<id>/	Board löschen
+Method	Endpoint	Description
+GET	/api/boards/	List user boards
+POST	/api/boards/	Create board
+GET	/api/boards/<id>/	Board details
+PATCH	/api/boards/<id>/	Update board
+DELETE	/api/boards/<id>/	Delete board
 
-Board Owner gilt automatisch als Member.
+Board owner is automatically considered a member.
 
 📋 Tasks API
-Methode	Endpoint	Beschreibung
-GET	/api/tasks/	Tasks aus eigenen Boards
-POST	/api/tasks/	Task erstellen
-GET	/api/tasks/<id>/	Task Details
-PATCH	/api/tasks/<id>/	Task bearbeiten
-DELETE	/api/tasks/<id>/	Nur Creator oder Board Owner
-GET	/api/tasks/assigned-to-me/	Mir zugewiesene Tasks
-GET	/api/tasks/reviewing/	Tasks zur Überprüfung
-Permissions
+Method	Endpoint	Description
+GET	/api/tasks/	List tasks from boards where user is owner/member
+POST	/api/tasks/	Create task
+GET	/api/tasks/<id>/	Task details
+PATCH	/api/tasks/<id>/	Update task
+DELETE	/api/tasks/<id>/	Only creator or board owner
+GET	/api/tasks/assigned-to-me/	Tasks assigned to current user
+GET	/api/tasks/reviewing/	Tasks where current user is reviewer
+Permissions (Tasks)
 
-Nur Board Members sehen Tasks
+Only board members can see tasks
 
-Nur Creator oder Board Owner dürfen löschen
+Only the creator or the board owner can delete a task
 
-Board kann nach Erstellung nicht geändert werden
+The board of a task cannot be changed after creation
 
 💬 Comments API
-Methode	Endpoint	Beschreibung
-GET	/api/tasks/<id>/comments/	Kommentare anzeigen
-POST	/api/tasks/<id>/comments/	Kommentar erstellen
-DELETE	/api/tasks/<task_id>/comments/<comment_id>/	Nur Author
+Method	Endpoint	Description
+GET	/api/tasks/<id>/comments/	List comments
+POST	/api/tasks/<id>/comments/	Create comment
+DELETE	/api/tasks/<task_id>/comments/<comment_id>/	Only the author
 🧪 Tests
 
-Alle Tests werden mit pytest ausgeführt.
+Run tests with:
 
 pytest -q
-
-Aktueller Status:
-
-6 passed
-📌 Projektstruktur
+pytest --cache-clear
+📁 Project Structure
 kanmind_backend/
 ├── authentication/
 ├── boards/
@@ -134,7 +129,7 @@ kanmind_backend/
 ├── manage.py
 ├── requirements.txt
 └── README.md
-👤 Autor
+👤 Author
 
 Muhammed Yunus Amini
 Developer Akademie
