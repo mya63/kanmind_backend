@@ -1,7 +1,17 @@
+# kanmind/urls.py
+
 from django.contrib import admin
 from django.urls import path, include
+from authentication.views import EmailCheckView  # MYA
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include("core.urls")),  # MYA: core routet nur weiter
+
+    # Apps
+    path("api/", include("authentication.urls")),
+    path("api/", include("tasks.urls")),
+    path("api/", include("boards.urls")),
+
+    # Extra endpoint
+    path("api/email-check/", EmailCheckView.as_view(), name="email-check"),  # MYA
 ]
