@@ -20,24 +20,25 @@ from django.core.exceptions import ValidationError
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def registration(request):
-    serializer = RegistrationSerializer(data=request.data)
+    # Accept JSON and form data; never crash on weird content-types
+    payload = request.data if isinstance(request.data, dict) else {}
 
+    serializer = RegistrationSerializer(data=payload)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     user = serializer.save()
-    token = Token.objects.create(user=user)
+    token, _ = Token.objects.get_or_create(user=user)
 
     return Response(
         {
             "token": token.key,
             "fullname": user.username,
             "email": user.email,
-            "user_id": user.id
+            "user_id": user.id,
         },
-        status=status.HTTP_201_CREATED
+        status=status.HTTP_201_CREATED,
     )
-
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
