@@ -86,8 +86,11 @@ class BoardDetailSerializer(serializers.ModelSerializer):  # MYA
 class BoardPatchSerializer(serializers.ModelSerializer):  # MYA
     owner_data = BoardMemberSerializer(source="owner", read_only=True)  # MYA
     members_data = BoardMemberSerializer(source="members", many=True, read_only=True)  # MYA
-    members = serializers.ListField(  # MYA
-        child=serializers.IntegerField(),
+
+    # MYA: CHANGED -> DRF Standard für M2M, verhindert 500er bei edge cases
+    members = serializers.PrimaryKeyRelatedField(  # MYA: CHANGED
+        many=True,
+        queryset=User.objects.all(),
         required=False
     )
 
@@ -96,17 +99,15 @@ class BoardPatchSerializer(serializers.ModelSerializer):  # MYA
         fields = ["id", "title", "members", "owner_data", "members_data"]  # MYA
 
     def update(self, instance, validated_data):  # MYA
-        # MYA: title updaten
+        # MYA: title updaten (optional bei PATCH)
         if "title" in validated_data:
             instance.title = validated_data["title"]
             instance.save()
 
-        # MYA: members LISTE SETZEN (ersetzen!)
+        # MYA: members ersetzen (optional bei PATCH)
         if "members" in validated_data:
-            ids = validated_data["members"]
-            users = User.objects.filter(id__in=ids)
-            instance.members.set(users)  # MYA: ersetzt komplett
-            # MYA: Owner immer drin lassen (optional, aber sinnvoll)
-            instance.members.add(instance.owner)
+            users = validated_data.get("members") or []  # MYA: CHANGED (defensiv)
+            instance.members.set(users)  # MYA
+            instance.members.add(instance.owner)  # MYA: Owner immer drin lassen
 
         return instance
