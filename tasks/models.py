@@ -2,7 +2,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from boards.models import Board  # MYA
+from boards.models import Board  
 
 
 class Task(models.Model):
@@ -20,7 +20,7 @@ class Task(models.Model):
         ("high", "high"),
     ]
 
-    board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name="tasks")  # MYA
+    board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name="tasks")  
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, default="")
 
@@ -34,19 +34,19 @@ class Task(models.Model):
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name="review_tasks"
     )  # MYA
 
-    due_date = models.DateField(null=True, blank=True)  # MYA
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_tasks")  # MYA
+    due_date = models.DateField(null=True, blank=True)  
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_tasks")  
 
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)  # MYA
+    updated_at = models.DateTimeField(auto_now=True)  
 
     def __str__(self):
         return self.title
 
 
 class Comment(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="comments")  # MYA
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="task_comments")  # MYA
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="comments") 
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="task_comments") 
     content = models.TextField()
 
     created_at = models.DateTimeField(auto_now_add=True)

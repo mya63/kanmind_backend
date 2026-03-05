@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 from django.urls import path, include
-from authentication.views import EmailCheckView  # MYA
+from authentication.views import EmailCheckView  
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -13,5 +13,5 @@ urlpatterns = [
     path("api/", include("boards.urls")),
 
     # Extra endpoint
-    path("api/email-check/", EmailCheckView.as_view(), name="email-check"),  # MYA
+    path("api/email-check/", EmailCheckView.as_view(), name="email-check"),  
 ]
