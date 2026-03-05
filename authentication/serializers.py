@@ -1,10 +1,12 @@
-# authentication/serializers.py
-
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
 
 class RegistrationSerializer(serializers.Serializer):
+    """
+    Validate registration data and create a Django User.
+    """
+
     fullname = serializers.CharField(max_length=150, allow_blank=False)
     email = serializers.EmailField(allow_blank=False)
     password = serializers.CharField(write_only=True, min_length=6)
@@ -17,21 +19,18 @@ class RegistrationSerializer(serializers.Serializer):
         return email
 
     def validate(self, attrs):
-        pw = attrs.get("password", "")
-        pw2 = attrs.get("repeated_password", "")
-        if pw != pw2:
+        if attrs.get("password") != attrs.get("repeated_password"):
             raise serializers.ValidationError({"repeated_password": "Passwords do not match."})
         return attrs
 
     def create(self, validated_data):
+        # Use fullname as username (simple and stable for tests)
         fullname = validated_data["fullname"].strip()
         email = validated_data["email"].strip().lower()
         password = validated_data["password"]
 
-        # Use fullname as username (simple + stable for tests)
-        user = User.objects.create_user(
+        return User.objects.create_user(
             username=fullname,
             email=email,
             password=password,
         )
-        return user

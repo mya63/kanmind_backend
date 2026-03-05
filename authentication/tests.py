@@ -6,12 +6,16 @@ from rest_framework.test import APIClient
 def test_registration_returns_token():
     client = APIClient()
 
-    res = client.post("/api/registration/", {
-        "fullname": "testuser1",
-        "email": "test1@mail.de",
-        "password": "testpass123",
-        "repeated_password": "testpass123"
-    }, format="json")
+    res = client.post(
+        "/api/registration/",
+        {
+            "fullname": "testuser1",
+            "email": "test1@mail.de",
+            "password": "testpass123",
+            "repeated_password": "testpass123",
+        },
+        format="json",
+    )
 
     assert res.status_code == 201
     assert "token" in res.data
@@ -24,21 +28,25 @@ def test_registration_returns_token():
 def test_login_returns_token():
     client = APIClient()
 
-    # Registrierung
-    reg = client.post("/api/registration/", {
-        "fullname": "testuser2",
-        "email": "test2@mail.de",
-        "password": "testpass123",
-        "repeated_password": "testpass123"
-    }, format="json")
-
+    # Register first
+    reg = client.post(
+        "/api/registration/",
+        {
+            "fullname": "testuser2",
+            "email": "test2@mail.de",
+            "password": "testpass123",
+            "repeated_password": "testpass123",
+        },
+        format="json",
+    )
     assert reg.status_code == 201
 
-    # Login (laut Doku: email + password)
-    res = client.post("/api/login/", {
-        "email": "test2@mail.de",
-        "password": "testpass123"
-    }, format="json")
+    # Login (spec: email + password)
+    res = client.post(
+        "/api/login/",
+        {"email": "test2@mail.de", "password": "testpass123"},
+        format="json",
+    )
 
     assert res.status_code == 200
     assert "token" in res.data
@@ -46,14 +54,15 @@ def test_login_returns_token():
     assert "email" in res.data
     assert "user_id" in res.data
 
+
 @pytest.mark.django_db
 def test_registration_unhappy_path_returns_400_instead_of_500():
     client = APIClient()
 
-    # wrong / incomplete data -> must be 400
+    # Missing required fields -> must return 400
     res = client.post("/api/registration/", {"email": "x@test.de"}, format="json")
     assert res.status_code == 400
 
-    # even with "weird" content-type style (form)
+    # Even with form-style payload, it must return 400 (not 500)
     res2 = client.post("/api/registration/", {"email": "x@test.de"})
     assert res2.status_code == 400
