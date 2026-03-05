@@ -1,5 +1,3 @@
-# tasks/views.py
-
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 
@@ -9,13 +7,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-from boards.models import Board  # MYA
-from tasks.models import Task, Comment  # MYA
-from tasks.serializers import TaskSerializer, CommentSerializer  # MYA
+from boards.models import Board 
+from tasks.models import Task, Comment 
+from tasks.serializers import TaskSerializer, CommentSerializer  
 
 
 def _is_board_member(board: Board, user: User) -> bool:
-    # MYA: Owner zählt als Member
+    """Return True if user is the board owner or a board member."""
     if board.owner_id == user.id:
         return True
     return board.members.filter(id=user.id).exists()
@@ -23,7 +21,9 @@ def _is_board_member(board: Board, user: User) -> bool:
 
 def _normalize_task_data(data: dict) -> dict:
     """
-    MYA: Tests schicken teils 'todo' statt 'to-do' -> mappen.
+    Normalize incoming task data to match the API spec.
+
+    MYA: Some tests send 'todo' instead of 'to-do' and 'inprogress' instead of 'in-progress'.
     """
     d = dict(data)
     status_val = d.get("status")
@@ -38,10 +38,12 @@ def _normalize_task_data(data: dict) -> dict:
 
 def _get_or_create_default_board(user: User) -> Board:
     """
-    MYA: Wenn kein board im POST kommt:
-    - nimm erstes Board wo User Owner ist
-    - sonst erstes Board wo User Member ist
-    - sonst erstelle Default-Board
+    Return a board for the user.
+
+    MYA: If no board is provided on task creation:
+    - use first board where user is owner
+    - else first board where user is member
+    - else create a 'Default Board'
     """
     board = Board.objects.filter(owner=user).first()
     if board:
@@ -51,7 +53,6 @@ def _get_or_create_default_board(user: User) -> Board:
     if board:
         return board
 
-    # MYA: Fix für Tests -> Default Board erzeugen
     return Board.objects.create(title="Default Board", owner=user)
 
 
@@ -59,21 +60,16 @@ def _get_or_create_default_board(user: User) -> Board:
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def tasks_list(request):
+    """List tasks for boards the user can access, or create a new task."""
     if request.method == "GET":
         qs = Task.objects.filter(board__members=request.user) | Task.objects.filter(board__owner=request.user)
         qs = qs.distinct().order_by("-updated_at")
         return Response(TaskSerializer(qs, many=True).data, status=status.HTTP_200_OK)
 
-    # ------------------------
-    # POST
-    # ------------------------
     incoming = _normalize_task_data(request.data)
     board_id = incoming.get("board")
 
-    if board_id:
-        board = get_object_or_404(Board, pk=board_id)
-    else:
-        board = _get_or_create_default_board(request.user)
+    board = get_object_or_404(Board, pk=board_id) if board_id else _get_or_create_default_board(request.user)
 
     if not _is_board_member(board, request.user):
         return Response({"detail": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
@@ -82,7 +78,7 @@ def tasks_list(request):
 
     serializer = TaskSerializer(data=incoming, context={"request": request})
     if serializer.is_valid():
-        task = serializer.save(created_by=request.user)  # MYA: created_by serverseitig
+        task = serializer.save(created_by=request.user)  # set created_by server-side
         return Response(TaskSerializer(task).data, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -92,24 +88,25 @@ def tasks_list(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def tasks_detail(request, task_id):
+    """Retrieve, update, or delete a task (board access required)."""
     task = get_object_or_404(Task, pk=task_id)
 
-    if request.method in ["GET", "PATCH"]:
-        if not _is_board_member(task.board, request.user):
-            return Response({"detail": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
+    if request.method in ["GET", "PATCH"] and not _is_board_member(task.board, request.user):
+        return Response({"detail": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == "GET":
         return Response(TaskSerializer(task).data, status=status.HTTP_200_OK)
 
     if request.method == "PATCH":
         incoming = _normalize_task_data(request.data)
+
         serializer = TaskSerializer(task, data=incoming, partial=True, context={"request": request})
         if serializer.is_valid():
             updated = serializer.save()
             return Response(TaskSerializer(updated).data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # DELETE: nur Task-Ersteller oder Board-Owner
+    # DELETE allowed only for creator or board owner
     if not (task.created_by_id == request.user.id or task.board.owner_id == request.user.id):
         return Response({"detail": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
 
@@ -121,6 +118,7 @@ def tasks_detail(request, task_id):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def tasks_assigned_to_me(request):
+    """Return tasks assigned to the current user."""
     qs = Task.objects.filter(assignee=request.user).order_by("-updated_at")
     return Response(TaskSerializer(qs, many=True).data, status=status.HTTP_200_OK)
 
@@ -129,6 +127,7 @@ def tasks_assigned_to_me(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def tasks_reviewing(request):
+    """Return tasks where the current user is reviewer."""
     qs = Task.objects.filter(reviewer=request.user).order_by("-updated_at")
     return Response(TaskSerializer(qs, many=True).data, status=status.HTTP_200_OK)
 
@@ -137,6 +136,7 @@ def tasks_reviewing(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def task_comments(request, task_id):
+    """List or create comments for a task (board access required)."""
     task = get_object_or_404(Task, pk=task_id)
 
     if not _is_board_member(task.board, request.user):
@@ -148,7 +148,7 @@ def task_comments(request, task_id):
 
     content = request.data.get("content", "")
     if not str(content).strip():
-        return Response({"content": "Dieser Wert darf nicht leer sein."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"content": "This field may not be blank."}, status=status.HTTP_400_BAD_REQUEST)  # MYA
 
     comment = Comment.objects.create(task=task, author=request.user, content=content)
     return Response(CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
@@ -158,10 +158,9 @@ def task_comments(request, task_id):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def delete_comment(request, task_id, comment_id):
+    """Delete a comment (only the author is allowed)."""
     comment = get_object_or_404(Comment, pk=comment_id, task_id=task_id)
 
-    # 🔥 ABSOLUT KEIN Board-Check hier!
-    # Nur der Author darf löschen
     if comment.author_id != request.user.id:
         return Response({"detail": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
 
