@@ -1,163 +1,107 @@
-# KanMind Backend API
+KanMind Backend API
 
-KanMind is a **Django REST Framework backend** for a task and kanban application.
+KanMind is a Django REST Framework backend for a task and kanban application.
 
-It provides a REST API with **token-based authentication** and is designed to be used with an external frontend.
+It provides a REST API with token-based authentication and is designed to work with an external frontend.
 
-This project was built as part of the **Developer Akademie**.
+This project was built as part of the Developer Akademie.
 
----
 
-# 🚀 Features
+🚀 Features
 
-- Token Authentication (Django REST Framework)
-- Board system with **Owner and Members**
-- Task CRUD API
-- Comment system
-- User assignment (**Assignee / Reviewer**)
-- Board-based access control
-- Filters:
-  - `assigned-to-me`
-  - `reviewing`
-- SQLite database
-- CORS support for external frontend
-- Automated tests with **pytest**
+Token authentication
 
----
+Boards with owner and members
 
-# 🧱 Tech Stack
+Task CRUD API
 
-- Python 3
-- Django 6.0.1
-- Django REST Framework 3.16.1
-- SQLite
-- pytest
+Comment system
 
----
+Task assignment (assignee / reviewer)
 
-# ⚙️ Installation & Setup
+Board-based access control
 
-## 1. Clone repository
+SQLite database
 
-```bash
+Automated tests with pytest
+
+
+🧱 Tech Stack
+
+Python
+
+Django
+
+Django REST Framework
+
+SQLite
+
+pytest
+
+
+⚙️ Installation
+Clone repository
 git clone <REPOSITORY_URL>
 cd kanmind_backend
-
-2. Create virtual environment
+Create virtual environment
 python -m venv venv
-3. Activate environment
+Activate environment
+
 Windows
+
 venv\Scripts\activate
+
 Mac / Linux
+
 source venv/bin/activate
-4. Install dependencies
+
+Install dependencies
+
 pip install -r requirements.txt
-5. Environment variables
 
-Create a .env file based on .env.example.
+Run migrations
 
-Example:
-
-SECRET_KEY=change-me
-DEBUG=1
-ALLOWED_HOSTS=127.0.0.1,localhost
-CORS_ALLOWED_ORIGINS=http://127.0.0.1:5500,http://localhost:5500
-SQLITE_NAME=db.sqlite3
-6. Run migrations
 python manage.py migrate
-7. Start server
+
+Start server
+
 python manage.py runserver
 
 Backend runs on:
 
 http://127.0.0.1:8000/
+
 🔐 Authentication
-Login
+
+Login endpoint:
+
 POST /api/login/
 
-Request body:
+Example request:
 
 {
   "username": "username",
   "password": "password"
 }
 
-Response:
+Example response:
 
 {
   "token": "abc123..."
 }
 
-Send the token in the request header:
+Use the token in request headers:
 
 Authorization: Token <YOUR_TOKEN>
-📌 Boards API
-Method	Endpoint	Description
-GET	/api/boards/	List user boards
-POST	/api/boards/	Create board
-GET	/api/boards/<id>/	Board details
-PATCH	/api/boards/<id>/	Update board
-DELETE	/api/boards/<id>/	Delete board
 
-The board owner is automatically a member.
-
-📋 Tasks API
-Method	Endpoint	Description
-GET	/api/tasks/	List tasks
-POST	/api/tasks/	Create task
-GET	/api/tasks/<id>/	Task details
-PATCH	/api/tasks/<id>/	Update task
-DELETE	/api/tasks/<id>/	Delete task
-
-Additional filters:
-
-Endpoint	Description
-/api/tasks/assigned-to-me/	Tasks assigned to the current user
-/api/tasks/reviewing/	Tasks where the user is reviewer
-
-Task rules:
-
-Only board members can see tasks
-
-Only the creator or board owner can delete a task
-
-The board of a task cannot be changed after creation
-
-💬 Comments API
-Method	Endpoint	Description
-GET	/api/tasks/<id>/comments/	List comments
-POST	/api/tasks/<id>/comments/	Create comment
-DELETE	/api/tasks/<task_id>/comments/<comment_id>/	Delete comment (author only)
 🧪 Tests
 
-Run tests with:
+Run tests:
 
-pytest -q
+pytest
 
-Optional:
 
-pytest --cache-clear
-
-Current status:
-
-31 tests
-
-All tests passing
-
-~96% coverage in the tasks app
-
-📁 Project Structure
-kanmind_backend/
-│
-├── authentication/
-├── boards/
-├── tasks/
-│
-├── manage.py
-├── requirements.txt
-└── README.md
 👤 Author
 
 Muhammed Yunus Amini
-
 Developer Akademie
