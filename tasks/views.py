@@ -23,7 +23,7 @@ def _normalize_task_data(data: dict) -> dict:
     """
     Normalize incoming task data to match the API spec.
 
-    MYA: Some tests send 'todo' instead of 'to-do' and 'inprogress' instead of 'in-progress'.
+     Some tests send 'todo' instead of 'to-do' and 'inprogress' instead of 'in-progress'.
     """
     d = dict(data)
     status_val = d.get("status")
@@ -40,7 +40,7 @@ def _get_or_create_default_board(user: User) -> Board:
     """
     Return a board for the user.
 
-    MYA: If no board is provided on task creation:
+     If no board is provided on task creation:
     - use first board where user is owner
     - else first board where user is member
     - else create a 'Default Board'
@@ -148,8 +148,7 @@ def task_comments(request, task_id):
 
     content = request.data.get("content", "")
     if not str(content).strip():
-        return Response({"content": "This field may not be blank."}, status=status.HTTP_400_BAD_REQUEST)  # MYA
-
+        return Response({"content": "This field may not be blank."}, status=status.HTTP_400_BAD_REQUEST)  # 
     comment = Comment.objects.create(task=task, author=request.user, content=content)
     return Response(CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
 

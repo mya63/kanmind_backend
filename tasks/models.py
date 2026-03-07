@@ -6,7 +6,7 @@ from boards.models import Board
 
 
 class Task(models.Model):
-    # MYA: Status + Priority exakt wie Doku
+    # Status + Priority exakt wie Doku
     STATUS_CHOICES = [
         ("to-do", "to-do"),
         ("in-progress", "in-progress"),
@@ -29,10 +29,10 @@ class Task(models.Model):
 
     assignee = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name="assigned_tasks"
-    )  # MYA
+    )  # 
     reviewer = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name="review_tasks"
-    )  # MYA
+    )  # 
 
     due_date = models.DateField(null=True, blank=True)  
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_tasks")  
