@@ -133,5 +133,5 @@ pytest
 # 👤 Author
 
 Muhammed Yunus Amini
-Developer Akademie
+
 
