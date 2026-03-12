@@ -136,9 +136,8 @@ STATIC_URL = "static/"
 
 CORS_ALLOWED_ORIGINS = os.getenv(
     "CORS_ALLOWED_ORIGINS",
-    "http://127.0.0.1:5500,http://localhost:5500,https://mya63.github.io,https://mya63.github.io/project.KanMind"
+    "http://127.0.0.1:5500,http://localhost:5500,https://mya63.github.io"
 ).split(",")
-
 CORS_ALLOW_CREDENTIALS = True
 
 
