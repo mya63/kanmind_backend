@@ -28,8 +28,10 @@ SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-me")
 
 DEBUG = os.getenv("DEBUG", "1") == "1"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
-
+ALLOWED_HOSTS = os.getenv(
+    "ALLOWED_HOSTS",
+    "127.0.0.1,localhost,.onrender.com"
+).split(",")
 
 # ---------------------------
 # Applications
@@ -134,7 +136,7 @@ STATIC_URL = "static/"
 
 CORS_ALLOWED_ORIGINS = os.getenv(
     "CORS_ALLOWED_ORIGINS",
-    "http://127.0.0.1:5500,http://localhost:5500",
+    "http://127.0.0.1:5500,http://localhost:5500,https://mya63.github.io,https://mya63.github.io/project.KanMind"
 ).split(",")
 
 CORS_ALLOW_CREDENTIALS = True
