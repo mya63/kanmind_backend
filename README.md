@@ -1,4 +1,5 @@
-
+Frontend (Live App):
+https://mya63.github.io/project.KanMind/
 # KanMind Backend API
 
 KanMind is a **Django REST Framework backend** for a task and kanban application.
