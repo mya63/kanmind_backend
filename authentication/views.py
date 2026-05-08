@@ -16,7 +16,7 @@ from .serializers import RegistrationSerializer
 # NEU: feste Guest-Login-Daten passend zum Frontend
 GUEST_EMAIL = "kevin@kovacsi.de"
 GUEST_PASSWORD = "asdasdasd"
-GUEST_USERNAME = "Kevin Kovacsi"
+GUEST_USERNAME = "Demo User"
 
 
 # NEU: erstellt den Guest-User automatisch, falls er auf Render fehlt
