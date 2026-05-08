@@ -13,12 +13,32 @@ from rest_framework.views import APIView
 from .serializers import RegistrationSerializer
 
 
+# NEU: feste Guest-Login-Daten passend zum Frontend
+GUEST_EMAIL = "kevin@kovacsi.de"
+GUEST_PASSWORD = "asdasdasd"
+GUEST_USERNAME = "Kevin Kovacsi"
+
+
+# NEU: erstellt den Guest-User automatisch, falls er auf Render fehlt
+def get_or_create_guest_user():
+    user, created = User.objects.get_or_create(
+        email=GUEST_EMAIL,
+        defaults={"username": GUEST_USERNAME},
+    )
+
+    if created or not user.check_password(GUEST_PASSWORD):
+        user.username = GUEST_USERNAME
+        user.set_password(GUEST_PASSWORD)
+        user.save()
+
+    return user
+
+
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def registration(request):
     """
     Register a new user and return an auth token.
-    Accepts JSON and form-encoded payloads and must never raise a 500 on bad input.
     """
     payload = request.data if isinstance(request.data, dict) else {}
 
@@ -46,11 +66,26 @@ def login(request):
     """
     Login using email + password and return an auth token.
     """
-    email = request.data.get("email", "").strip()
+    email = request.data.get("email", "").strip().lower()
     password = request.data.get("password", "")
 
     if not email or not password:
         return Response({"detail": "Email and password are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # NEU: Guest Login funktioniert direkt beim Klick
+    if email == GUEST_EMAIL and password == GUEST_PASSWORD:
+        user = get_or_create_guest_user()
+        token, _ = Token.objects.get_or_create(user=user)
+
+        return Response(
+            {
+                "token": token.key,
+                "fullname": user.username,
+                "email": user.email,
+                "user_id": user.id,
+            },
+            status=status.HTTP_200_OK,
+        )
 
     user_obj = User.objects.filter(email__iexact=email).first()
     if not user_obj:
